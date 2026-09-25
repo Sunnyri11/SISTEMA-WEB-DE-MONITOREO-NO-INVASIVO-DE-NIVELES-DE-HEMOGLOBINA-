@@ -159,26 +159,40 @@
   </div>
 
   <script>
-    document.getElementById("formSistema").addEventListener("submit", function(e) {
-      e.preventDefault();
+   document.getElementById("formSistema").addEventListener("submit", async function(e) {
+  e.preventDefault();
 
-      const accion = e.submitter.value;
-      const email = document.getElementById("correo").value;
-      const password = document.getElementById("password").value;
-      const rol = document.getElementById("rol").value;
+  const email = document.getElementById("correo").value;
+  const password = document.getElementById("password").value;
+  const rol = document.getElementById("rol").value;
 
-      let pacientes = JSON.parse(localStorage.getItem("pacientes")) || [];
-
-      if (accion === "login") {
-        const encontrado = pacientes.find(p => p.correo === email && p.password === password);
-        if (encontrado) {
-          alert("Inicio de sesión exitoso. Bienvenido " + encontrado.nombre + "!");
-            window.location.href = "Monitoreo.html"; 
-        } else {
-          alert("Correo o contraseña incorrectos.");
-        }
-      }
+  try {
+    const respuesta = await fetch("https://localhost:7176/api/autenticacion/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email: email, password: password, rol: rol })
     });
+
+    const datos = await respuesta.json();
+
+    if (respuesta.ok) {
+      alert("Inicio de sesión exitoso. ¡Bienvenido " + datos.nombre + "!");
+      // Guardamos el token e información en el localStorage para enviarlo en las consultas protegidas
+      localStorage.setItem("token_seguridad", datos.token);
+      localStorage.setItem("usuario_rol", datos.rol);
+      localStorage.setItem("usuario_id", datos.idEntidad);
+      
+      window.location.href = "Monitoreo.html"; 
+    } else {
+      alert(datos.mensaje || "Error al iniciar sesión.");
+    }
+  } catch (error) {
+    alert("No se pudo conectar con el servidor de la API.");
+  }
+});
+
   </script>
 
 </body>

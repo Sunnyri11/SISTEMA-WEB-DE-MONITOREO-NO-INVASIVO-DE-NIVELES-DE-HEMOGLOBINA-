@@ -132,7 +132,7 @@
 <div class="card">
   <div class="header-title">
     <h1>Sistema de Análisis</h1>
-    <p>Registro de Nuevo Paciente</p>
+    <p>Registro de Nuevo Usuario</p>
   </div>
 
   <form id="formRegistro">
@@ -157,10 +157,10 @@
         <label>Género biológico</label>
         <div class="radio-group">
           <label class="radio-option">
-            <input type="radio" name="genero" value="M" checked> Hombre
+            <input type="radio" name="genero" value="Masculino" checked> Hombre
           </label>
           <label class="radio-option">
-            <input type="radio" name="genero" value="F"> Mujer
+            <input type="radio" name="genero" value="Femenino"> Mujer
           </label>
         </div>
       </div>
@@ -170,21 +170,11 @@
       </div>
     </div>
 
-    <!-- Sección Geográfica y Altitud -->
     <div class="row-2">
       <div class="form-group">
         <label for="departamento">Departamento</label>
         <select id="departamento" name="departamento" onchange="cargarProvincias()" required>
-          <option value="" disabled selected>Seleccione...</option>
-          <option value="La Paz">La Paz</option>
-          <option value="Oruro">Oruro</option>
-          <option value="Potosí">Potosí</option>
-          <option value="Cochabamba">Cochabamba</option>
-          <option value="Chuquisaca">Chuquisaca</option>
-          <option value="Tarija">Tarija</option>
-          <option value="Santa Cruz">Santa Cruz</option>
-          <option value="Beni">Beni</option>
-          <option value="Pando">Pando</option>
+          <option value="" disabled selected>Cargando departamentos...</option>
         </select>
       </div>
 
@@ -199,7 +189,7 @@
     <div class="form-group">
       <label for="altitud">Altitud (m.s.n.m.)</label>
       <input type="number" id="altitud" name="altitud" placeholder="Ej. 3600" required>
-      <span class="helper-text">Modificable según la localidad exacta (ej. valle, yungas o altiplano).</span>
+      <span class="helper-text">Modificable según la localidad exacta.</span>
     </div>
 
     <div class="form-group">
@@ -212,129 +202,172 @@
       <input type="password" id="password" name="password" required placeholder="••••••••">
     </div>
 
-    <button type="submit" class="btn-submit">Registrar Paciente</button>
+    <div class="form-group">
+      <label for="rol">Rol en el Sistema</label>
+      <select id="rol" name="rol" required onchange="Selector()">
+        <option value="" disabled selected>Seleccione el Rol</option>
+        <option value="Paciente">Paciente</option>
+        <option value="Medico">Médico</option>
+      </select>
+    </div>
+
+    <!-- Contenedor Oculto de Especialidades (Solo se activa si el Rol es Medico) -->
+    <div id="contenedorEspecialidad" class="form-group" style="display: none; margin-top: 16px;">
+      <label for="especialidad">Especialidad Médica</label>
+      <select id="especialidad" name="especialidad">
+        <option value="" disabled selected>Seleccione especialidad</option>
+      </select>
+    </div>
+    
+    <button type="submit" class="btn-submit">Registrar Usuario</button>
   </form>
   <hr>
-  <a class="btn btn-primary" href="Login.html">Iniciar Sesion</a>
+  <a class="btn btn-primary" href="index.html">Iniciar Sesión</a>
 </div>
 
 <script>
-  // Diccionario con Departamentos, sus Provincias y la altitud promedio en m.s.n.m.
-  // Puedes expandir esta lista con el resto de provincias para tu base de datos (PostgreSQL/Laravel).
-  const datosGeograficos = {
-    "La Paz": {
-      "Murillo": 3640,
-      "Aroma": 3900,
-      "Nor Yungas": 1500,
-      "Sud Yungas": 1700,
-      "Los Andes": 3800,
-      "Omasuyos": 3820
-    },
-    "Cochabamba": {
-      "Cercado": 2570,
-      "Quillacollo": 2425,
-      "Chapare": 400,
-      "Punata": 2730
-    },
-    "Santa Cruz": {
-      "Andrés Ibáñez": 416,
-      "Warnes": 340,
-      "Chiquitos": 296,
-      "Cordillera": 800
-    },
-    "Oruro": {
-      "Cercado": 3710,
-      "Avaroa": 3750
-    },
-    "Potosí": {
-      "Tomás Frías": 4060,
-      "Quijarro": 3670
-    },
-    "Chuquisaca": {
-      "Oropeza": 2790,
-      "Zudáñez": 2450
-    },
-    "Tarija": {
-      "Cercado": 1870,
-      "Gran Chaco": 600
-    },
-    "Beni": {
-      "Cercado": 160,
-      "Vaca Díez": 140
-    },
-    "Pando": {
-      "Nicolás Suárez": 205,
-      "Manuripi": 170
-    }
-  };
+  const API_BASE_URL = "https://localhost:7176/api";
 
-  function cargarProvincias() {
-    const deptoSeleccionado = document.getElementById('departamento').value;
+  // 1. Cargar Departamentos automáticamente desde MySQL al abrir la página
+  document.addEventListener("DOMContentLoaded", async () => {
+    const selectDepto = document.getElementById('departamento');
+    try {
+      const respuesta = await fetch(`${API_BASE_URL}/geografia/departamentos`);
+      if (respuesta.ok) {
+        const departamentos = await respuesta.json();
+        selectDepto.innerHTML = '<option value="" disabled selected>Seleccione departamento</option>';
+        departamentos.forEach(d => {
+          let option = document.createElement('option');
+          option.value = d.idDepartamento; 
+          option.textContent = d.departamento1;
+          selectDepto.appendChild(option);
+        });
+      }
+    } catch (error) {
+      console.error("Error al cargar departamentos:", error);
+    }
+  });
+
+  // 2. Cargar Provincias/Ciudades dinámicamente filtradas por el departamento
+  async function cargarProvincias() {
+    const idDepto = document.getElementById('departamento').value;
     const selectProvincia = document.getElementById('provincia');
     const inputAltitud = document.getElementById('altitud');
 
-    // Limpiar provincias y altitud anteriores
     selectProvincia.innerHTML = '<option value="" disabled selected>Seleccione provincia</option>';
     inputAltitud.value = '';
 
-    if (deptoSeleccionado && datosGeograficos[deptoSeleccionado]) {
-      const provincias = datosGeograficos[deptoSeleccionado];
-      
-      // Llenar el nuevo select de provincias
-      for (const prov in provincias) {
-        let option = document.createElement('option');
-        option.value = prov;
-        option.textContent = prov;
-        selectProvincia.appendChild(option);
+    if (!idDepto) return;
+
+    try {
+      const respuesta = await fetch(`${API_BASE_URL}/geografia/provincias/${idDepto}`);
+      if (respuesta.ok) {
+        const provincias = await respuesta.json();
+        provincias.forEach(p => {
+          let option = document.createElement('option');
+          option.value = p.idCiudad; 
+          option.textContent = p.nombre;
+          option.setAttribute('data-altitud', p.altitud); 
+          selectProvincia.appendChild(option);
+        });
+      }
+    } catch (error) {
+      console.error("Error al obtener las provincias:", error);
+    }
+  }
+
+  // 3. Evaluar Rol: Si es Médico muestra el select y consume de la BD, si es Paciente no hace nada
+  async function Selector() {
+    const rolSeleccionado = document.getElementById("rol").value;
+    const contenedorEsp = document.getElementById("contenedorEspecialidad");
+    const selectEsp = document.getElementById("especialidad");
+
+    // Limpieza por defecto
+    contenedorEsp.style.display = "none";
+    selectEsp.removeAttribute("required");
+    selectEsp.innerHTML = '<option value="" disabled selected>Seleccione especialidad</option>';
+
+    if (rolSeleccionado === "Medico") {
+      contenedorEsp.style.display = "block";
+      selectEsp.setAttribute("required", "required"); // Se vuelve obligatorio si es médico
+
+      try {
+        const respuestaesp = await fetch(`${API_BASE_URL}/Especialidades`); 
+        if (respuestaesp.ok) {
+          const especialidades = await respuestaesp.json();
+          especialidades.forEach(e => {
+            let option = document.createElement('option');
+            option.value = e.idEspecialidad; 
+            option.textContent = e.nombre;
+            selectEsp.appendChild(option);
+          });
+        }
+      } catch (error) {
+        console.error("Error al cargar especialidades:", error);
       }
     }
   }
 
+  // 4. Asignar la altitud promedio calculada de la provincia seleccionada
   function actualizarAltitud() {
-    const deptoSeleccionado = document.getElementById('departamento').value;
-    const provinciaSeleccionada = document.getElementById('provincia').value;
+    const selectProvincia = document.getElementById('provincia');
+    const optionSeleccionada = selectProvincia.options[selectProvincia.selectedIndex];
     const inputAltitud = document.getElementById('altitud');
 
-    if (deptoSeleccionado && provinciaSeleccionada) {
-      const altitud = datosGeograficos[deptoSeleccionado][provinciaSeleccionada];
-      if (altitud !== undefined) {
-        inputAltitud.value = altitud;
-      }
+    if (optionSeleccionada && optionSeleccionada.value) {
+      const altitud = optionSeleccionada.getAttribute('data-altitud');
+      inputAltitud.value = altitud || 0;
+    } else {
+      inputAltitud.value = '';
     }
   }
 
-document.getElementById('formRegistro').addEventListener('submit', function(e) {
-  e.preventDefault();
+  // 5. Envío estructurado del JSON final discriminando el rol hacia la API
+  document.getElementById('formRegistro').addEventListener('submit', async function(e) {
+    e.preventDefault();
 
-  const dataPaciente = {
-    nombre: document.getElementById('nombre').value,
-    apellido_paterno: document.getElementById('apellido_paterno').value,
-    apellido_materno: document.getElementById('apellido_materno').value,
-    genero: document.querySelector('input[name="genero"]:checked').value,
-    fecha_nacimiento: document.getElementById('fecha_nacimiento').value,
-    departamento: document.getElementById('departamento').value,
-    provincia: document.getElementById('provincia').value,
-    altitud: parseFloat(document.getElementById('altitud').value),
-    correo: document.getElementById('correo').value,
-    password: document.getElementById('password').value
-  };
+    const selectDepto = document.getElementById('departamento');
+    const selectProv = document.getElementById('provincia');
+    const selectEsp = document.getElementById('especialidad');
+    const rolSeleccionado = document.getElementById('rol').value;
 
-  // Recuperar lista de pacientes ya guardados
-  let pacientes = JSON.parse(localStorage.getItem('pacientes')) || [];
+    const dataUsuario = {
+      nombre: document.getElementById('nombre').value,
+      apellidoPaterno: document.getElementById('apellido_paterno').value,
+      apellidoMaterno: document.getElementById('apellido_materno').value,
+      genero: document.querySelector('input[name="genero"]:checked').value,
+      fechaNacimiento: document.getElementById('fecha_nacimiento').value,
+      departamento: selectDepto.options[selectDepto.selectedIndex].text,
+      provincia: selectProv.options[selectProv.selectedIndex].text,
+      altitud: parseFloat(document.getElementById('altitud').value),
+      correo: document.getElementById('correo').value,
+      password: document.getElementById('password').value,
+      rol: rolSeleccionado,
+      // Si el rol es médico introduce el entero de la especialidad, sino manda un nulo plano
+      idEspecialidad: rolSeleccionado === "Medico" ? parseInt(selectEsp.value) : 0
+    };
 
-  // Agregar el nuevo paciente
-  pacientes.push(dataPaciente);
+    try {
+      const respuesta = await fetch(`${API_BASE_URL}/registro/usuario`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dataUsuario)
+      });
 
-  // Guardar de nuevo en localStorage
-  localStorage.setItem('pacientes', JSON.stringify(pacientes));
-
-  // Confirmación visual
-  alert("Paciente registrado");
-  window.location.href = "Monitoreo.html"; 
-  // Limpiar formulario
-  document.getElementById('formRegistro').reset();
-});
-
+      const resultado = await respuesta.json();
+      if (respuesta.ok) {
+        alert(resultado.mensaje);
+        window.location.href = "Login.html";
+      } else {
+        alert(resultado.mensaje || "Ocurrió un inconveniente al registrar.");
+      }
+    } catch (error) {
+      alert("No se pudo conectar con el servidor de la API.");
+      console.error(error);
+    }
+  });
 </script>
 
 </body>
