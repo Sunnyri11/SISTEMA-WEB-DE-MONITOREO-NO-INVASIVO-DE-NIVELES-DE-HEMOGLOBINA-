@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="BibliotecaSistemaHB/BibliotecaSistemaHB.csproj" />
+  <Project Path="SistemaHBAPI/SistemaHBAPI.csproj" />
+</Solution>
