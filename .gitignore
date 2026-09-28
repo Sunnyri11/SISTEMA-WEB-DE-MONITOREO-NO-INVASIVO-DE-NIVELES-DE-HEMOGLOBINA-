@@ -1,0 +1,33 @@
+## Visual Studio / Roslyn / MSBuild
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+bld/
+[Log]/
+
+## Visual Studio Cache y Configuración
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+
+## VS Code y Rider
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+
+## Paquetes y dependencias (NuGet)
+*.nuget.props
+*.nuget.targets
+packages/
+
+## Secretos y configuraciones locales
+appsettings.Development.json
+appsettings.Local.json
+*.secrets.json
