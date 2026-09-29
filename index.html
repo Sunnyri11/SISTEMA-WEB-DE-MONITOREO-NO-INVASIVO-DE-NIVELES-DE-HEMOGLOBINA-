@@ -167,7 +167,7 @@
   const rol = document.getElementById("rol").value;
 
   try {
-    const respuesta = await fetch("https://localhost:7176/api/autenticacion/login", {
+    const respuesta = await fetch("https://api-prueba-sistema-hb.onrender.com/api/autenticacion/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
