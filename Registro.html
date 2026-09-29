@@ -226,7 +226,7 @@
 </div>
 
 <script>
-  const API_BASE_URL = "https://api-prueba-sistema-hb.onrender.com/scalar/api";
+  const API_BASE_URL = "https://api-prueba-sistema-hb.onrender.com/api";
 
   // 1. Cargar Departamentos automáticamente desde MySQL al abrir la página
   document.addEventListener("DOMContentLoaded", async () => {
@@ -235,11 +235,12 @@
       const respuesta = await fetch(`${API_BASE_URL}/geografia/departamentos`);
       if (respuesta.ok) {
         const departamentos = await respuesta.json();
+        console.log(departamentos);
         selectDepto.innerHTML = '<option value="" disabled selected>Seleccione departamento</option>';
         departamentos.forEach(d => {
           let option = document.createElement('option');
           option.value = d.idDepartamento; 
-          option.textContent = d.departamento1;
+          option.textContent = d.nombre;
           selectDepto.appendChild(option);
         });
       }
