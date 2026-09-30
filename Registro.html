@@ -360,7 +360,7 @@
       const resultado = await respuesta.json();
       if (respuesta.ok) {
         alert(resultado.mensaje);
-        window.location.href = "Login.html";
+        window.location.href = "index.html";
       } else {
         alert(resultado.mensaje || "Ocurrió un inconveniente al registrar.");
       }

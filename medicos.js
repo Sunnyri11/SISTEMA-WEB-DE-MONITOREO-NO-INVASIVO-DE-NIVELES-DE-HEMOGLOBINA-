@@ -1,6 +1,6 @@
 function cerrarSesion() {
     localStorage.removeItem("token_seguridad");
-    localStorage.removeItem("usuario_rol");
+    localStorage.removeItem("usuario_role");
     localStorage.removeItem("usuario_id");
     window.location.href = "index.html";
 }
@@ -53,33 +53,34 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             datos.pacientes.forEach(p => {
                 let badgeEstilo = "";
-                let filaBordeColor = "";
+                let colorAvatar = ""; // Nueva variable para controlar el color del círculo del avatar
 
                 if (p.estadoSalud === "Anemia") {
                     conteoAnemia++;
-                    filaBordeColor = "border-anemia";
                     badgeEstilo = "badge-anemia";
+                    colorAvatar = "var(--color-anemia)";
                 } else if (p.estadoSalud === "Poliglobulia") {
                     conteoPoliglobulia++;
-                    filaBordeColor = "border-poliglobulia";
                     badgeEstilo = "badge-poliglobulia";
+                    colorAvatar = "var(--color-poliglobulia)";
                 } else if (p.estadoSalud === "Normal") {
                     conteoNormal++;
-                    filaBordeColor = "border-normal";
                     badgeEstilo = "badge-normal";
+                    colorAvatar = "var(--color-normal)";
                 }
 
                 const hbValor = p.valorHemoglobina ? `${p.valorHemoglobina} g/dL` : "Sin registros";
                 const letraInicial = p.nombrePaciente.charAt(0).toUpperCase();
                 
-                const fila = `<tr class="${filaBordeColor}">
+                // Se reemplazó .paciente-info por .patient-cell para emparejar con el CSS unificado
+                const fila = `<tr title="Pasar el mouse para inspeccionar el historial clínico de ${p.nombrePaciente}">
                     <td>
-                        <div class="paciente-info">
-                            <div class="avatar">${letraInicial}</div>
+                        <div class="patient-cell">
+                            <div class="avatar" style="background-color: ${colorAvatar};">${letraInicial}</div>
                             <span>${p.nombrePaciente}</span>
                         </div>
                     </td>
-                    <td style="text-align: center; font-weight:700;">${hbValor}</td>
+                    <td style="text-align: center;" class="hb-value">${hbValor}</td>
                     <td style="text-align: center;"><span class="badge ${badgeEstilo}">${p.estadoSalud}</span></td>
                 </tr>`;
                 cuerpoTabla.innerHTML += fila;
@@ -95,11 +96,15 @@ document.addEventListener("DOMContentLoaded", async function () {
                 const finAnemia = finNormal + porcAnemia;
 
                 const donut = document.getElementById("graficoDonut");
+                
+                // Se actualiza el Tooltip interactivo con los valores en tiempo real al pasar el mouse por encima
+                donut.title = `Distribución actual:\n• Normales: ${conteoNormal}\n• Anemia: ${conteoAnemia}\n• Poliglobulia: ${conteoPoliglobulia}`;
+                
                 // Inyección del gradiente analítico cónico directamente en los estilos del elemento
                 donut.style.background = `conic-gradient(
-                    #10b981 0% ${finNormal}%, 
-                    #ef4444 ${finNormal}% ${finAnemia}%, 
-                    #f59e0b ${finAnemia}% 100%
+                    var(--color-normal) 0% ${finNormal}%, 
+                    var(--color-anemia) ${finNormal}% ${finAnemia}%, 
+                    var(--color-poliglobulia) ${finAnemia}% 100%
                 )`;
             }
 
