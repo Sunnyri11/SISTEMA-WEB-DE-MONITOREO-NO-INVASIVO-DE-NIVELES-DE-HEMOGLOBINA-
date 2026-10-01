@@ -230,7 +230,7 @@
   document.addEventListener("DOMContentLoaded", async () => {
     const selectDepto = document.getElementById('departamento');
     try {
-      const respuesta = await fetch(`${API_URL}/geografia/departamentos`);
+      const respuesta = await fetch(`${API_URL}geografia/departamentos`);
       if (respuesta.ok) {
         const departamentos = await respuesta.json();
         console.log(departamentos);
@@ -259,7 +259,7 @@
     if (!idDepto) return;
 
     try {
-      const respuesta = await fetch(`${API_URL}/geografia/provincias/${idDepto}`);
+      const respuesta = await fetch(`${API_URL}geografia/provincias/${idDepto}`);
       if (respuesta.ok) {
         const provincias = await respuesta.json();
         provincias.forEach(p => {
@@ -291,7 +291,7 @@
       selectEsp.setAttribute("required", "required"); // Se vuelve obligatorio si es médico
 
       try {
-        const respuestaesp = await fetch(`${API_URL}/Especialidades`); 
+        const respuestaesp = await fetch(`${API_URL}Especialidades`); 
         if (respuestaesp.ok) {
           const especialidades = await respuestaesp.json();
           especialidades.forEach(e => {
@@ -347,7 +347,7 @@
     };
 
     try {
-      const respuesta = await fetch(`${API_URL}/registro/usuario`, {
+      const respuesta = await fetch(`${API_URL}registro/usuario`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
