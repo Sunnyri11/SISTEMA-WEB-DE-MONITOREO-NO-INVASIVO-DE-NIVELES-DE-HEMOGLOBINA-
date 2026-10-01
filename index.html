@@ -171,7 +171,7 @@
       </button>
     </form>
     <hr>
-    <a href="Registro.html" class="btn btn-secondary">
+    <a href="view/Registro.html" class="btn btn-secondary">
       Registrar nuevo paciente
     </a>
   </div>
@@ -210,11 +210,11 @@
 
         // Redirección basada en el rol que devuelve la API
         if (datos.rol === "Paciente") {
-          window.location.href = "Monitoreo.html";
+          window.location.href = "view/Monitoreo.html";
         } else if (datos.rol === "Medico") {
-          window.location.href = "Pagina_Medicos.html";
+          window.location.href = "view/Pagina_Medicos.html";
         } else if (datos.rol === "Administrador") {
-          window.location.href = "Pagina_Administrador.html";
+          window.location.href = "view/Pagina_Administrador.html";
         }
       } else {
         alert(datos.mensaje || "Error 400: Datos incorrectos o formato inválido.");
