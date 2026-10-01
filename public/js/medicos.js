@@ -2,7 +2,7 @@ function cerrarSesion() {
     localStorage.removeItem("token_seguridad");
     localStorage.removeItem("usuario_role");
     localStorage.removeItem("usuario_id");
-    window.location.href = "index.html";
+    window.location.href = "../index.html";
 }
 
 document.addEventListener("DOMContentLoaded", async function () {
@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     if (!token || !rol || rol.trim().toLowerCase() !== "medico") {
         alert("Acceso no autorizado. Inicie sesión nuevamente.");
-        window.location.href = "index.html";
+        window.location.href = "../index.html";
         return;
     }
 

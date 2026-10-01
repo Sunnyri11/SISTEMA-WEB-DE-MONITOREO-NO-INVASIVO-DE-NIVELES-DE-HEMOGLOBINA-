@@ -6,7 +6,7 @@ function cerrarSesion() {
     localStorage.removeItem("token_seguridad");
     localStorage.removeItem("usuario_rol");
     localStorage.removeItem("usuario_id");
-    window.location.href = "index.html";
+    window.location.href = "../index.html";
 }
 
 document.addEventListener("DOMContentLoaded", async function () {
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Validación estricta de seguridad en el cliente
     if (!token || !rol || rol.trim().toLowerCase() !== "administrador") {
         alert("Acceso denegado. Inicie sesión con credenciales de Administrador.");
-        window.location.href = "index.html";
+        window.location.href = "../index.html";
         return;
     }
 

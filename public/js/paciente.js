@@ -9,7 +9,7 @@ function cerrarSesion() {
     localStorage.removeItem("usuario_rol");
     localStorage.removeItem("usuario_id");
     localStorage.removeItem("usuario_correo");
-    window.location.href = "index.html";
+    window.location.href = "../index.html";
 }
 
 // --- CARGA INICIAL DEL EXPEDIENTE Y OPTIMIZACIÓN DE RENDIMIENTO ---
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     if (!token || !rol || rol.trim().toLowerCase() !== "paciente") {
         alert("Acceso no autorizado. Por favor, inicie sesión nuevamente.");
-        window.location.href = "index.html";
+        window.location.href = "../index.html";
         return;
     }
 
